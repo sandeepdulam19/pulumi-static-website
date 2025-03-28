@@ -18,12 +18,12 @@ const publicAccessBlock = new aws.s3.BucketPublicAccessBlock("disablePublicAcces
     restrictPublicBuckets: false,
 });
 
-// Upload the index.html file
+// Upload the index.html file (without setting ACL)
 const indexHtml = new aws.s3.BucketObject("index", {
     bucket: bucket,
     source: new pulumi.asset.FileAsset("index.html"), // Ensure this file exists
     contentType: "text/html",
-    acl: undefined, // Remove ACL or set to undefined
+    acl: undefined, // Remove the ACL from the file object
 });
 
 // Define a public bucket policy
