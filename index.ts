@@ -7,7 +7,6 @@ const bucket = new aws.s3.Bucket("my-static-site", {
         indexDocument: "index.html",
         errorDocument: "error.html",
     },
-    acl: "public-read", // Allow public read access
 });
 
 // Disable public access block to allow public policies
@@ -24,7 +23,7 @@ const indexHtml = new aws.s3.BucketObject("index", {
     bucket: bucket,
     source: new pulumi.asset.FileAsset("index.html"), // Ensure this file exists
     contentType: "text/html",
-    acl: "public-read", // Make the file publicly accessible
+    acl: undefined, // Remove ACL or set to undefined
 });
 
 // Define a public bucket policy
