@@ -14,9 +14,7 @@ jobs:
         run: curl -fsSL https://get.pulumi.com | sh
 
       - name: Set Up AWS Credentials
-        run: |
-          
-          echo "PULUMI_ACCESS_TOKEN=${{ secrets.PULUMI_ACCESS_TOKEN }}" >> $GITHUB_ENV
+        run: echo "PULUMI_ACCESS_TOKEN=${{ secrets.PULUMI_ACCESS_TOKEN }}" >> $GITHUB_ENV
 
       - name: Select Pulumi Stack
         run: pulumi stack select dev  # Replace <your-stack-name> with your actual stack name
