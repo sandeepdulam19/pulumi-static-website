@@ -63,7 +63,7 @@ const subnet = new aws.ec2.Subnet("my-subnet", {
     vpcId: vpc.id,
     cidrBlock: "10.0.1.0/24", // Adjust CIDR as needed
     availabilityZone: "us-east-1a", // Adjust as needed
-    mapPublicIpOnLaunch: true,
+    mapPublicIpOnLaunch: false, // Set this to false for private subnet
     tags: {
         Name: "my-subnet",
     },
@@ -137,7 +137,7 @@ const service = new aws.ecs.Service("my-ecs-service", {
   taskDefinition: taskDefinition.arn,
   desiredCount: 1,
   networkConfiguration: {
-    assignPublicIp: true,
+    assignPublicIp: false, // Set this to false to avoid assigning public IP for private subnet
     subnets: [subnet.id],
     securityGroups: [securityGroup.id],
   },
