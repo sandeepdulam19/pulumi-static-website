@@ -38,7 +38,7 @@ const bucketPolicy = new aws.s3.BucketPolicy("bucketPolicy", {
             Principal: "*",
             Action: "s3:GetObject",
             Resource: `arn:aws:s3:::${id}/*`,
-        }],
+        }], 
     })),
 });
 
@@ -47,6 +47,44 @@ export const bucketName = bucket.bucket;
 export const websiteUrl = bucket.websiteEndpoint;
 
 // -------------------- ECS with OIDC Authentication --------------------
+
+// Create a VPC
+const vpc = new aws.ec2.Vpc("my-vpc", {
+    cidrBlock: "10.0.0.0/16", // Adjust CIDR as needed
+    enableDnsSupport: true,
+    enableDnsHostnames: true,
+    tags: {
+        Name: "my-vpc",
+    },
+});
+
+// Create a subnet
+const subnet = new aws.ec2.Subnet("my-subnet", {
+    vpcId: vpc.id,
+    cidrBlock: "10.0.1.0/24", // Adjust CIDR as needed
+    availabilityZone: "us-east-1a", // Adjust as needed
+    mapPublicIpOnLaunch: true,
+    tags: {
+        Name: "my-subnet",
+    },
+});
+
+// Create a Security Group
+const securityGroup = new aws.ec2.SecurityGroup("my-sg", {
+    vpcId: vpc.id,
+    egress: [{
+        cidrBlocks: ["0.0.0.0/0"],
+        fromPort: 0,
+        toPort: 0,
+        protocol: "tcp",
+    }],
+    ingress: [{
+        cidrBlocks: ["0.0.0.0/0"],
+        fromPort: 80,
+        toPort: 80,
+        protocol: "tcp",
+    }],
+});
 
 // Create an ECS Cluster
 const cluster = new aws.ecs.Cluster("my-cluster");
@@ -93,11 +131,16 @@ const taskDefinition = new aws.ecs.TaskDefinition("my-task-definition", {
   taskRoleArn: role.arn,
 });
 
-// Create a service for the ECS cluster
+// Create an ECS Service with Network Configuration
 const service = new aws.ecs.Service("my-ecs-service", {
   cluster: cluster.id,
   taskDefinition: taskDefinition.arn,
   desiredCount: 1,
+  networkConfiguration: {
+    assignPublicIp: true,
+    subnets: [subnet.id],
+    securityGroups: [securityGroup.id],
+  },
 });
 
 // Export ECS service details
